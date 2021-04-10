@@ -1,0 +1,26 @@
+Models {
+	City {
+		id: int
+		name: string
+	}
+	User {
+		id: int
+		nome: string
+		idade: float
+		city: City
+	}
+}
+
+Routes {
+	Models.User {
+	# // semantico = model existe #
+		GetUsers {
+			Method: GET
+			Path: /user 			
+		}
+		GetUserByID {
+			Method: GET
+			Path: /user/:id
+		}
+	}
+}
