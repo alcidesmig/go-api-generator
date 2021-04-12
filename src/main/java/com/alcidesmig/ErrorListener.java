@@ -1,20 +1,14 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.alcidesmig;
 
 import java.io.PrintWriter;
 import java.util.BitSet;
-import org.antlr.v4.runtime.ANTLRErrorListener; // cuidado para importar a versão 4
+import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
-import org.antlr.v4.runtime.Token; // Vamos também precisar de Token
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
-// Outros imports vão ser necessários aqui. O NetBeans ou IntelliJ fazem isso automaticamente
 
 public class ErrorListener implements ANTLRErrorListener {
 

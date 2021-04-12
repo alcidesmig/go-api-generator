@@ -1,0 +1,42 @@
+Models {
+	Notebook {
+		name: string
+	}
+	User {
+		nome: string
+		idade: float
+		city: Notebook
+	}
+}
+
+Routes {
+	Models.User {
+	# comment #
+		GetUsers {
+			Method: GET
+			Path: /user 			
+		}
+		GetUserByID {
+			Method: GET
+			Path: /user/:id
+		}
+		PostUser {
+			Method: POST
+			Path: /user
+		}
+		PutUser {
+			Method: PUT
+			Path: /user/:id
+		}
+		DeleteUser {
+			Method: DELETE
+			Path: /user/:id
+		}
+	}
+	Models.Notebook {
+		GetNotebooks {
+			Method: GET
+			Path: /notebooks
+		}
+	}
+}
