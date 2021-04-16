@@ -1,13 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.alcidesmig;
 
 import com.alcidesmig.grammar.APiAPIBaseVisitor;
 import com.alcidesmig.grammar.APiAPIParser;
-import com.alcidesmig.grammar.APiAPIParser.FieldContext;
 import java.util.ArrayList;
 import java.util.List;
 import org.antlr.v4.runtime.Token;
@@ -46,11 +40,13 @@ public class Semantic extends APiAPIBaseVisitor<Void> {
 
     @Override
     public Void visitModel(APiAPIParser.ModelContext ctx) {
+        // Verify if the id was already used
         if (classesMemory.exists(ctx.IDENT().getText())) {
             addSemanticError(ctx.getStart(), "already declared identifier (" + ctx.IDENT().getText() + ")");
             return null;
         }
         APIClass current = new APIClass();
+        // Povoate class fields and check for the existence of the used type
         ctx.fields().field().forEach(field -> {
             String currentType = getType(field.type().getText());
             if (currentType == null) {
@@ -59,23 +55,30 @@ public class Semantic extends APiAPIBaseVisitor<Void> {
                 current.addField(field.IDENT().getText(), currentType);
             }
         });
+        // Add the class to the memory
         classesMemory.addClass(ctx.IDENT().getText(), current);
         return null;
     }
 
     @Override
     public Void visitRoutes(APiAPIParser.RoutesContext ctx) {
+        // Verify if the id was declared
         if (getType(ctx.IDENT().getText()) == null) {
             addSemanticError(ctx.getStart(), "type not declared (" + ctx.IDENT().getText() + ")");
         }
 
+        // Create routes, verifying if the name of the route was already used,
+        // verifying parameters and agreement with route method
         for (APiAPIParser.RouteContext routeContext : ctx.route()) {
             if (routesMemory.exists(routeContext.IDENT().getText())) {
                 addSemanticError(ctx.getStart(), "name of route already used(" + routeContext.IDENT().getText() + ")");
                 continue;
             }
             if (routeContext.routeSpecs().path().param() != null) {
-                if (!routeContext.routeSpecs().path().param().IDENT().getText().equals("id")) { // change to generic 
+                // For now, the grammar allow to any parameter to be passed, however
+                // for this first version only id is allow by the semantic verification.
+                // Was left like that to future expansion, allowing all existent parameters.
+                if (!routeContext.routeSpecs().path().param().IDENT().getText().equals("id")) {
                     addSemanticError(ctx.getStart(), "parameter does not exist (" + routeContext.routeSpecs().path().param().IDENT().getText() + ")");
                     continue;
                 }

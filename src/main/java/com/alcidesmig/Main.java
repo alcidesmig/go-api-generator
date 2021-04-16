@@ -13,7 +13,7 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
 
 public class Main {
-    
+
     static CharStream cs;
     static APiAPILexer lex;
     static APiAPIParser parser;
@@ -21,69 +21,64 @@ public class Main {
     static CommonTokenStream tokens;
     static PrintWriter pw;
     static CodeBuilder cb;
-    
+
     public static void main(String args[]) throws IOException {
-        // Inicia o PrintWriter para escrever o output no arquivo passado como parâmetro
-        // CharStreams do arquivo de entrada passado como parâmetro
+        // Init printwriter to be used to write data for output file
         pw = new PrintWriter(new File(args[1]));
 
-        // Executa lexer e, se tudo estiver correto na parte léxica, executa o parser sintático
-        if (lexer(args[0]) && parser(args[0])) {
-            semantic(args[0]);
+        // Execute lexer, parser and semantic. Finally, execute code builder.
+        // the approval of the last step is necessary to execute the next
+        // Semantic is too used by code builder (povoate classesMemory and
+        // routesMemory)
+        if (lexer(args[0]) && parser(args[0]) && semantic(args[0])) {
             cb = new CodeBuilder(Semantic.classesMemory, Semantic.routesMemory);
             cb.build(args[2]);
-            
         }
-
-        // Fecha arquivo de output
         pw.close();
-        
     }
-    
+
     static boolean semantic(String file) throws IOException {
         try {
-            // Inicia o CharStream novamente
+            // Re-init charstream
             cs = CharStreams.fromFileName(file);
-            // Instancia o Lexer gerado pelo ANTLR
+            // Init Lexer
             lex = new APiAPILexer(cs);
-            // Cria o CommonTokenStream
+            // Init CommonTokenStream
             tokens = new CommonTokenStream(lex);
-            // Instancia o Parser gerado pelo ANTLR
+            // Instantiate parser
             APiAPIParser parser = new APiAPIParser(tokens);
-            // Resgata arvore semântica
+            // Get semantic tree
             APiAPIParser.MainContext tree = parser.main();
-            // Instância o visitor
+            // Instantiate semantic visitor
             Semantic main = new Semantic();
-            // Visita a árvore de forma recursiva
+            // Visite semantic tree - recursive
             main.visitMain(tree);
-            // Imprime os erros no arquivo de output
+            // Print errors
             Semantic.semanticErrors.forEach((s) -> pw.write(s + "\n"));
-            // Imprime fim da compilação
+
             pw.println("End of compilation");
-            // Fecha o arquivo de output
             pw.close();
             return true;
         } catch (IOException | RecognitionException e) {
             return false;
         }
     }
-    
+
     static boolean parser(String file) throws IOException {
-        // Inicia o CharStream novamente
+        // Re-init charstream
         cs = CharStreams.fromFileName(file);
-        // Instancia o Lexer gerado pelo ANTLR
+        // Init Lexer
         lex = new APiAPILexer(cs);
-        // Cria o CommonTokenStream
+        // Init CommonTokenStream
         tokens = new CommonTokenStream(lex);
-        // Instancia o Parser gerado pelo ANTLR
+        // Instantiate parser
         parser = new APiAPIParser(tokens);
-        // Instancia o error listener
+        // Instantiate error listener
         ErrorListener mcel = new ErrorListener(pw);
-        // Remove o error listener default
+        // Update used error listener 
         parser.removeErrorListeners();
-        // Attach do error listener no parser
         parser.addErrorListener(mcel);
-        // Execute o parser (sintático)
+        // Execute parser
         try {
             parser.main();
         } catch (Exception e) {
@@ -94,31 +89,30 @@ public class Main {
         }
         return true;
     }
-    
+
     static boolean lexer(String file) throws IOException {
         cs = CharStreams.fromFileName(file);
-        // Instancia o Lexer gerado pelo ANTLR
+        // Instantiate lexer
         lex = new APiAPILexer(cs);
         tokens = new CommonTokenStream(lex);
-        
+
         Token token;
         boolean error = false;
-        
+
         OUTER:
         while ((token = lex.nextToken()).getType() != Token.EOF) {
-            // System.out.println(token.getText());
             String symbolicName = APiAPILexer.VOCABULARY.getSymbolicName(token.getType());
             if (symbolicName == null) {
                 continue;
             }
             switch (symbolicName) {
                 case "WRONG_COMMENT":
-                    // Erro comentário
+                    // Error: malformed comment
                     pw.write(String.format("Line %d: comment not closed\n", token.getLine()));
                     error = true;
                     break OUTER;
                 case "WRONG_SYMBOL":
-                    // Erro simbolo
+                    // Error: unknown symbol
                     pw.write(String.format("Line %d: %s - symbol not identified\n", token.getLine(), token.getText()));
                     error = true;
                     break OUTER;

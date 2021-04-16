@@ -29,9 +29,9 @@ func main() {
 type User struct {
 	ID int `json:"id";gorm:"primaryKey"`
 	Idade float64 `json:"Idade"`
-	CityID int `json:"CityID"`
-	City *Notebook `json:"City,omitempty";gorm:"references:CityID"`
 	Nome string `json:"Nome"`
+	NotebookID int `json:"NotebookID"`
+	Notebook *Notebook `json:"Notebook,omitempty";gorm:"references:NotebookID"`
 }
 
 type Notebook struct {

@@ -5,7 +5,7 @@ Models {
 	User {
 		nome: string
 		idade: float
-		city: Notebook
+		notebook: Notebook
 	}
 }
 

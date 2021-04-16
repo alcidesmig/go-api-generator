@@ -61,6 +61,7 @@ public class CodeBuilder {
         pw.close();
     }
 
+    // Build the used imports
     private void imports() {
         writeLine("package main");
         writeBreakline();
@@ -80,11 +81,13 @@ public class CodeBuilder {
         writeBreakline();
     }
 
+    // Build database singleton
     private void dbConnect() {
         writeLine("var db, _ = gorm.Open(sqlite.Open(\"gorm.db\"), &gorm.Config{})");
         writeBreakline();
     }
 
+    // Build the main function with the respective routes
     private void main() {
         writeLine("func main() {");
         currentIdentation++;
@@ -101,10 +104,8 @@ public class CodeBuilder {
 
         writeBreakline();
 
-        writeLine(
-                "router := vestigo.NewRouter()");
-        for (Entry<String, RoutesManager.RouteContent> route
-                : routesMemory.getRoutes()) {
+        writeLine("router := vestigo.NewRouter()");
+        for (Entry<String, RoutesManager.RouteContent> route : routesMemory.getRoutes()) {
             writeText("router.");
             switch (route.getValue().getMethod()) {
                 case "GET":
@@ -124,13 +125,12 @@ public class CodeBuilder {
             writeBreakline();
         }
 
-        writeLine(
-                "log.Fatal(http.ListenAndServe(\":8080\", router))");
+        writeLine("log.Fatal(http.ListenAndServe(\":8080\", router))");
         currentIdentation--;
-        writeLine(
-                "}");
+        writeLine("}");
     }
 
+    // Build the models with the correct data types
     private void models() {
         writeBreakline();
         for (Entry<String, APIClass> cl : classesMemory.getClasses()) {
@@ -153,6 +153,7 @@ public class CodeBuilder {
         }
     }
 
+    // Build the functions to get data from database
     private void dbGets() {
         writeBreakline();
         for (Entry<String, APIClass> cl : classesMemory.getClasses()) {
@@ -183,10 +184,10 @@ public class CodeBuilder {
             currentIdentation--;
             writeLine("}");
             writeBreakline();
-
         }
     }
 
+    // Build the functions to save data to database
     private void dbSaves() {
         writeBreakline();
         for (Entry<String, APIClass> cl : classesMemory.getClasses()) {
@@ -200,7 +201,8 @@ public class CodeBuilder {
             writeBreakline();
         }
     }
-
+    
+    // Build the functions to delete data from database
     private void dbDeletes() {
         writeBreakline();
         for (Entry<String, APIClass> cl : classesMemory.getClasses()) {
@@ -215,6 +217,7 @@ public class CodeBuilder {
         }
     }
 
+    // Build the route handlers functions
     private void routes() {
         for (Entry<String, RoutesManager.RouteContent> route : routesMemory.getRoutes()) {
             writeLine("func " + route.getKey() + "(w http.ResponseWriter, r *http.Request) {");
@@ -369,19 +372,3 @@ public class CodeBuilder {
     }
 
 }
-
-//
-//func GetClusterById(id uint) (cluster *Cluster, err error) {
-//	cluster = new(Cluster)
-//	res := db.Where("id = ?", id).Find(&cluster)
-//
-//	err = res.Error
-//	if errors.Is(err, gorm.ErrRecordNotFound) || res.RowsAffected == 0 {
-//		log.Log.Debug("Cluster not found", zap.Error(err), zap.Uint("id", id))
-//		return nil, gorm.ErrRecordNotFound
-//	} else if err != nil {
-//		log.log.Println("Something went wrong while querying for cluster", zap.Error(err))
-//	}
-//
-//	return
-//}
