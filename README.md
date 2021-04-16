@@ -42,3 +42,7 @@ After generating, you need to put the generated file in `goproject` folder, name
 ## Example
 
 One generated API can be consulted in `goproject`.
+
+## Tests
+
+Some tests of the lexer, parser and semantic analyzer can be checked in `./tests`.
