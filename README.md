@@ -27,6 +27,8 @@ Routes {
 }
 ```
 
+For now, only 1:n relationships are accepted.
+
 ## Generating one API
 
 The project can be build using `make build` (attempt to set the correct paths inside `Makefile`), and then the API can be generated using:
